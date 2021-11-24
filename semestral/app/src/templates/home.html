@@ -4,7 +4,11 @@
 <h1 align="center">Foods</h1>
 <ul class="list-group list-group-flush" id="foods">
     {% for food in user.foods %}
-    <li class="list-group-item">{{ food.data }}
+    <li class="list-group-item">
+        {{ food.data }} 
+        {% for category in food.categories %}
+        {{category.name}}
+        {% endfor %}
         <button type="button" class="close" onClick="deleteFood({{ food.id }} )">
             <span aria-hidden="true">&times;</span>
         </button>
@@ -12,7 +16,21 @@
     {% endfor %}
 </ul>
 <form method="POST">
-    <textarea name="food" id="food" class="form-control"></textarea> 
+    <input 
+        type="text" 
+        name="food" 
+        id="food" 
+        class="form-control"
+        placeholder="Input new food name"
+    />
+    {% for category in user.categories %}
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="" id="'category_'+category.id|string }}" name="{{ 'category_'+category.id|string }}">
+        <label class="form-check-label" for="{{ 'category_'+category.id|string }}">
+            {{ category.name }}
+        </label>
+    </div>
+    {% endfor %}
     <br />
     <div align="center">
         <button type="submit" class="btn btn-primary">Add food</button>

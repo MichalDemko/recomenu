@@ -6,3 +6,12 @@ function deleteFood(foodId){
         window.location.href = "/";
     });
 }
+
+function deleteCategory(categoryId){
+    fetch('/delete-category', {
+        method: 'POST',
+        body: JSON.stringify({ categoryId: categoryId})
+    }).then((_res) => {
+        window.location.href = "/settings";
+    });
+}
