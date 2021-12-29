@@ -15,3 +15,12 @@ function deleteCategory(categoryId){
         window.location.href = "/settings";
     });
 }
+
+function updateCategory(categoryId, updateparameter){
+    fetch('/update-category', {
+        method: 'POST',
+        body: JSON.stringify({ categoryId: categoryId, value: updateparameter.value})
+    }).then((_res) => {
+        window.location.href = "/settings";
+    });
+}

@@ -5,7 +5,7 @@
 <ul class="list-group list-group-flush" id="foods">
     {% for food in user.foods %}
     <li class="list-group-item">
-        {{ food.data }} 
+        {{ food.name }} 
         {% for category in food.categories %}
         {{category.name}}
         {% endfor %}
@@ -25,7 +25,7 @@
     />
     {% for category in user.categories %}
     <div class="form-check">
-        <input class="form-check-input" type="checkbox" value="" id="'category_'+category.id|string }}" name="{{ 'category_'+category.id|string }}">
+        <input class="form-check-input" type="checkbox" value="" id="{{'category_'+category.id|string }}" name="{{ 'category_'+category.id|string }}">
         <label class="form-check-label" for="{{ 'category_'+category.id|string }}">
             {{ category.name }}
         </label>

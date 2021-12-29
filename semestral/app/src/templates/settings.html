@@ -5,6 +5,19 @@
     {% for category in user.categories %}
     <li class="list-group-item">
         {{ category.name }} 
+        <input 
+            type="range"
+            name="{{'categoryvalue_'+category.id|string}}"
+            id="{{'categoryvalue_'+category.id|string}}"
+            class="form-range"
+            min="0"
+            max="1"
+            step="0.01"
+            value="{{category.value}}"
+        />
+        <button type="button" class="btn btn-secondary" onClick="updateCategory({{ category.id }}, {{'categoryvalue_'+category.id|string}} )">
+            <span>Update</span>
+        </button>
         <button type="button" class="close" onClick="deleteCategory({{ category.id }} )">
             <span aria-hidden="true">&times;</span>
         </button>
@@ -18,7 +31,17 @@
         id="category" 
         class="form-control"
         placeholder="input new category"
-    /> 
+    />
+    <br />
+    <input
+        type="range"
+        name="categoryvalue"
+        id="categoryvalue"
+        class="form-range"
+        min="0"
+        max="1"
+        step="0.01"
+    />
     <br />
     <div align="center">
         <button type="submit" class="btn btn-primary">Add category</button>
