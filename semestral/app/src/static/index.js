@@ -24,3 +24,14 @@ function updateCategory(categoryId, updateparameter){
         window.location.href = "/settings";
     });
 }
+
+function addToMenu(foodId){
+    date = document.querySelector('input[name="weekday"]:checked').value;
+    console.log(date);
+    fetch('/add-to-menu', {
+        method: 'POST',
+        body: JSON.stringify({ foodId: foodId, date: date})
+    }).then((_res) => {
+        window.location.href = "/menu";
+    });
+}

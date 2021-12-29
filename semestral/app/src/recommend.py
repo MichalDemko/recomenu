@@ -65,3 +65,12 @@ def compute_value(dataMatrix: pd.DataFrame, kernel: pd.DataFrame) -> pd.DataFram
     result = np.sum(dataMatrix.to_numpy() * kernel.to_numpy(),axis=1)
 
     return pd.DataFrame(result, index = index, columns=['value'])
+
+
+def alter_values(food: Food, date: date):
+    for category in food.categories:
+        category.immediateValue *= 0.5
+        db.session.commit()
+    food.lastServed = date
+    db.session.commit()
+    return

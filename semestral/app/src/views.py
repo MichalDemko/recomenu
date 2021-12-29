@@ -2,10 +2,12 @@ from os import name
 from flask import Blueprint, render_template, request, flash, jsonify
 from flask_login import login_required, current_user
 from flask_sqlalchemy.model import camel_to_snake_case
-from .models import Category, Food
+from sqlalchemy.sql.elements import and_
+from .models import Category, Food, Menu
 from . import db
-from .recommend import get_food_list
-from datetime import date
+from .recommend import get_food_list, alter_values
+from .menuview import get_menu
+from datetime import date, datetime
 import json
 
 views = Blueprint('views',__name__)
@@ -47,7 +49,9 @@ def delete_food():
 @login_required
 def menu():
     foodlist = get_food_list(current_user, date(2021,12,28))
-    return render_template("menu.html", user=current_user, foodlist=foodlist)
+    menu = get_menu(current_user)
+    print(foodlist)
+    return render_template("menu.html", user = current_user, foodlist = foodlist, menu = menu)
 
 
 @views.route('/settings',methods=['GET','POST'])
@@ -68,6 +72,33 @@ def settings():
 
     return render_template("settings.html", user=current_user)
 
+
+@views.route('/add-to-menu', methods=['POST'])
+def add_to_menu():
+    data = json.loads(request.data)
+    print(data)
+    menu = db.session.query(Menu).filter(
+        and_(Menu.date == data['date'], Menu.user_id == current_user.id)
+    ).first()
+    food = Food.query.get(data['foodId'])
+    date = datetime.strptime(data['date'], "%Y-%m-%d").date()
+    if menu:
+        if food in menu.foods:
+            flash('Food is in the menu for that day!',category='error')
+            return jsonify({})
+        alter_values(food,date)
+        menu.foods.append(food)
+        db.session.commit()
+    else:
+        print("create menu")
+        print(datetime.strptime(data['date'], "%Y-%m-%d").date())
+        newmenu= Menu(user_id = current_user.id, 
+                      date = date)
+        alter_values(food,date)
+        newmenu.foods.append(food)
+        db.session.add(newmenu)
+        db.session.commit()
+    return jsonify({})
 
 
 @views.route('/delete-category', methods=['POST'])

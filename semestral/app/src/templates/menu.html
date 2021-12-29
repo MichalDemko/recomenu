@@ -5,24 +5,46 @@
 <div class="container">
     <div class="row">
         <div class="col-8">
-            menu
+            <ul class="list-group list-group-flush" id="menu">
+            {% for day in menu %}
+            
+            <li class="list-group-item">
+                {{day}}
+
+                <ul class="list-group list-group-flush">
+                {% for item in menu[day]['foods'] %}
+                    <li class="list-group-item">
+                        {{item}}
+                    </li>
+                {% endfor %}
+                <li class="list-group-item"> 
+                    <input type="radio" name="weekday" value="{{menu[day]['date']}}">
+                </li>
+                </ul>
+            </li>
+            {% endfor %}
+            </ul>
         </div>
         <div class="col-4">
+            <div style="position: fixed;">
             <ul class="list-group list-group-flush" id="foods">
                 {% for food in foodlist %}
                 <li class="list-group-item">
-                    {{food, foodlist[food]}}
-                    <!-- 
-                    </br>
-                    {% for category in food.categories %}
-                    {{category.name}}
-                    {% endfor %}
-                    <button type="button" class="close" onClick="">
-                        <span aria-hidden="true">&times;</span>
-                    </button>       Write your comments here -->
+                    <h6>{{foodlist[food]['name']}}</h6>
+                    <div>
+                        {% for category in foodlist[food]['categories']%}
+                            {{category[1]}}
+                        {% endfor %}
+                        <button type="button" class="close" onClick="addToMenu({{ food }})">
+                            <span aria-hidden="true">&radic;</span>
+                        </button>
+                    </div>
+
+
                 </li>
                 {% endfor %}
             </ul>
+            </div>
         </div>
     </div>
 
