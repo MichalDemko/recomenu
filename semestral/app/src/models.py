@@ -23,6 +23,7 @@ class Food(db.Model):
     value = db.Column(db.Float())
     user_id = db.Column(db.Integer,db.ForeignKey('users.id'))
     categories = db.relationship('Category', secondary = 'food_category',back_populates = 'foods')
+    menus = db.relationship('Menu', secondary = 'food_menu',back_populates = 'foods')
 
 class FoodCategory(db.Model):
     __tablename__ = "food_category"
@@ -38,3 +39,20 @@ class User(db.Model, UserMixin):
     first_name = db.Column(db.String(150))
     foods = db.relationship('Food')
     categories = db.relationship('Category')
+    menus = db.relationship('Menu')
+
+
+class FoodMenu(db.Model):
+    __tablename__ = "food_menu"
+    id = db.Column(db.Integer, primary_key=True)
+    food_id = db.Column(db.Integer, db.ForeignKey('foods.id'))
+    menu_id = db.Column(db.Integer, db.ForeignKey('menus.id'))
+
+
+class Menu(db.Model):
+    __tablename__ = "menus"
+    id = db.Column(db.Integer, primary_key = True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    date = db.Column(db.Date)
+    foods = db.relationship('Food', secondary='food_menu', back_populates='menus')
+    __table_args__ = (db.UniqueConstraint('user_id', 'date', name = '_menu_user_date_uc'),)
