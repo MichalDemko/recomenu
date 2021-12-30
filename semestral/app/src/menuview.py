@@ -7,8 +7,6 @@ import pandas as pd
 import calendar
 
 def get_menu(user, year: int = None, weekNumber: int = None) -> dict:
-    
-    
     if year == None and weekNumber == None:
         return select_week(user, dt.date.today().isocalendar().year, dt.date.today().isocalendar().week)
     return select_week(user, year, weekNumber)
@@ -30,11 +28,15 @@ def select_week(user, year: int, weekNumber: int) -> dict:
         menu = qry.filter(Menu.date == date).first()
         if menu is None:
             week[ calendar.day_name[date.weekday() ] ] = {'menu_id': None, 
-                                                          'date': date, 
+                                                          'date': date,
+                                                          'nextweek': date+dt.timedelta(days=7),
+                                                          'beforeweek': date-dt.timedelta(days=7),
                                                           'foods': []}
         else:
             week[ calendar.day_name[date.weekday() ] ] = {'menu_id': menu.id, 
-                                                          'date': date, 
-                                                          'foods': [x.name for x in menu.foods]}
+                                                          'date': date,
+                                                          'nextweek': date+dt.timedelta(days=7),
+                                                          'beforeweek': date-dt.timedelta(days=7),
+                                                          'foods': [(x.id,x.name) for x in menu.foods]}
     print(week)
     return week

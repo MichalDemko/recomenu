@@ -5,7 +5,7 @@ from flask_sqlalchemy.model import camel_to_snake_case
 from sqlalchemy.sql.elements import and_
 from .models import Category, Food, Menu
 from . import db
-from .recommend import get_food_list, alter_values
+from .recommend import get_food_list, alter_values_add, alter_values_remove
 from .menuview import get_menu
 from datetime import date, datetime
 import json
@@ -49,7 +49,14 @@ def delete_food():
 @login_required
 def menu():
     foodlist = get_food_list(current_user, date(2021,12,28))
-    menu = get_menu(current_user)
+    mydate = request.args.get('date')
+    if mydate:
+        mydate = datetime.strptime(mydate, "%Y-%m-%d").date()
+        menu = get_menu(current_user,mydate.isocalendar().year,mydate.isocalendar().week)
+        #foodlist = get_food_list(current_user, data['date'])
+    else:
+        menu = get_menu(current_user)
+        #foodlist = get_food_list(current_user, date().today())
     print(foodlist)
     return render_template("menu.html", user = current_user, foodlist = foodlist, menu = menu)
 
@@ -86,7 +93,7 @@ def add_to_menu():
         if food in menu.foods:
             flash('Food is in the menu for that day!',category='error')
             return jsonify({})
-        alter_values(food,date)
+        alter_values_add(food,date)
         menu.foods.append(food)
         db.session.commit()
     else:
@@ -94,10 +101,21 @@ def add_to_menu():
         print(datetime.strptime(data['date'], "%Y-%m-%d").date())
         newmenu= Menu(user_id = current_user.id, 
                       date = date)
-        alter_values(food,date)
+        alter_values_add(food,date)
         newmenu.foods.append(food)
         db.session.add(newmenu)
         db.session.commit()
+    return jsonify({})
+
+
+@views.route('/delete-from-menu', methods=['POST'])
+def delete_from_menu():
+    data = json.loads(request.data)
+    food = Food.query.get(data['food_id'])
+    menu = Menu.query.get(data['menu_id'])
+    menu.foods.remove(food)
+    db.session.commit()
+    alter_values_remove(food)
     return jsonify({})
 
 

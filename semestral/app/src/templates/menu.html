@@ -5,6 +5,7 @@
 <div class="container">
     <div class="row">
         <div class="col-8">
+            <p style="text-align: center;">{{menu['Monday']['date']|string+' - '+menu['Sunday']['date']|string}}</p>
             <ul class="list-group list-group-flush" id="menu">
             {% for day in menu %}
             
@@ -14,16 +15,28 @@
                 <ul class="list-group list-group-flush">
                 {% for item in menu[day]['foods'] %}
                     <li class="list-group-item">
-                        {{item}}
+                        {{item[1]}}
+                        <button type="button" class="close" onClick="deleteMenuFood({{ menu[day]['menu_id']}} , {{item[0]}} )">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </li>
                 {% endfor %}
                 <li class="list-group-item"> 
                     <input type="radio" name="weekday" value="{{menu[day]['date']}}">
+
                 </li>
                 </ul>
             </li>
             {% endfor %}
             </ul>
+            <div style="text-align: center;">
+                <button type="button" class="close" onClick="changeToPage({{  '"'+menu['Monday']['nextweek']|string+'"'  }})">
+                    <span aria-hidden="true">&gt;</span>
+                </button>
+                <button type="button" class="close" onClick="changeToPage({{  '"'+menu['Monday']['beforeweek']|string+'"'  }})">
+                    <span aria-hidden="true">&lt;</span>
+                </button>
+            </div>
         </div>
         <div class="col-4">
             <div style="position: fixed;">
@@ -39,8 +52,6 @@
                             <span aria-hidden="true">&radic;</span>
                         </button>
                     </div>
-
-
                 </li>
                 {% endfor %}
             </ul>

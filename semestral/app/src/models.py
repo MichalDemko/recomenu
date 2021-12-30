@@ -23,7 +23,7 @@ class Food(db.Model):
     value = db.Column(db.Float())
     user_id = db.Column(db.Integer,db.ForeignKey('users.id'))
     categories = db.relationship('Category', secondary = 'food_category',back_populates = 'foods')
-    menus = db.relationship('Menu', secondary = 'food_menu',back_populates = 'foods')
+    menus = db.relationship('Menu', secondary = 'food_menu', back_populates = 'foods', lazy='dynamic')
 
 class FoodCategory(db.Model):
     __tablename__ = "food_category"

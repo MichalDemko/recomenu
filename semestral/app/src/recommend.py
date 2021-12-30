@@ -1,6 +1,8 @@
 from os import name
+
+from sqlalchemy.sql.expression import asc, desc
 from . import db
-from .models import Category, Food
+from .models import Category, Food, Menu
 import pandas as pd
 import numpy as np
 from datetime import date
@@ -67,10 +69,23 @@ def compute_value(dataMatrix: pd.DataFrame, kernel: pd.DataFrame) -> pd.DataFram
     return pd.DataFrame(result, index = index, columns=['value'])
 
 
-def alter_values(food: Food, date: date):
+def alter_values_add(food: Food, date: date):
     for category in food.categories:
         category.immediateValue *= 0.5
         db.session.commit()
     food.lastServed = date
     db.session.commit()
+    return
+
+def alter_values_remove(food: Food):
+    for category in food.categories:
+        category.immediateValue *= 1.2
+        db.session.commit()
+    entity = food.menus.order_by(desc(Menu.date)).first()
+    if entity:
+        food.lastServed = entity.date
+        db.session.commit()
+    else:
+        food.lastServed = date(2021,12,10)
+        db.session.commit()
     return
