@@ -40,21 +40,33 @@
         </div>
         <div class="col-4">
             <div style="position: fixed;">
-            <ul class="list-group list-group-flush" id="foods">
-                {% for food in foodlist %}
-                <li class="list-group-item">
-                    <h6>{{foodlist[food]['name']}}</h6>
-                    <div>
-                        {% for category in foodlist[food]['categories']%}
-                            {{category[1]}}
-                        {% endfor %}
-                        <button type="button" class="close" onClick="addToMenu({{ food }})">
-                            <span aria-hidden="true">&radic;</span>
-                        </button>
+                <div>
+                    {% for cat in categories %}
+                    <div class="form-check form-check-inline">
+                        <input type="checkbox" class="form-check-input" id="{{cat}}" autocomplete="off" value="{{cat}}" name="categoryfilter"
+                        {% if categories[cat]['checked'] == 1 %} checked  {% endif %}>
+                        <label class="form-check-label" for="{{cat}}">{{ categories[cat]['name'] }}</label>
                     </div>
-                </li>
-                {% endfor %}
-            </ul>
+                    {% endfor %}
+                </div>
+                <br>
+                <div>
+                    <ul class="list-group list-group-flush" id="foods">
+                        {% for food in foodlist %}
+                        <li class="list-group-item">
+                            <h6>{{foodlist[food]['name']}}</h6>
+                            <div>
+                                {% for category in foodlist[food]['categories']%}
+                                    {{category[1]}}
+                                {% endfor %}
+                                <button type="button" class="close" onClick="addToMenu({{ food }})">
+                                    <span aria-hidden="true">&radic;</span>
+                                </button>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
             </div>
         </div>
     </div>

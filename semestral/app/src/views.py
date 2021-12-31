@@ -1,13 +1,15 @@
-from os import name
+import os
+from .config import configuration
 from flask import Blueprint, render_template, request, flash, jsonify
 from flask_login import login_required, current_user
-from flask_sqlalchemy.model import camel_to_snake_case
 from sqlalchemy.sql.elements import and_
 from .models import Category, Food, Menu
 from . import db
-from .recommend import get_food_list, alter_values_add, alter_values_remove
+from .recommend import get_food_list, alter_values_add, alter_values_remove, filter_food_list
+from .build import build_categories, allowed_file
 from .menuview import get_menu
 from datetime import date, datetime
+from werkzeug.utils import secure_filename
 import json
 
 views = Blueprint('views',__name__)
@@ -50,32 +52,57 @@ def delete_food():
 def menu():
     foodlist = get_food_list(current_user, date(2021,12,28))
     mydate = request.args.get('date')
+    categories_checked = request.args.get('categories')
     if mydate:
         mydate = datetime.strptime(mydate, "%Y-%m-%d").date()
         menu = get_menu(current_user,mydate.isocalendar().year,mydate.isocalendar().week)
-        #foodlist = get_food_list(current_user, data['date'])
     else:
         menu = get_menu(current_user)
-        #foodlist = get_food_list(current_user, date().today())
-    print(foodlist)
-    return render_template("menu.html", user = current_user, foodlist = foodlist, menu = menu)
+
+    if categories_checked:
+        print("CATEGORIES")
+        print(categories_checked)
+        categories_checked = categories_checked.split(',')
+        foodlist = filter_food_list(foodlist, categories_checked)
+        categories = build_categories(current_user, categories_checked)
+    else:
+        categories = build_categories(current_user)
+
+    return render_template("menu.html", user = current_user, foodlist = foodlist, menu = menu, categories = categories)
 
 
 @views.route('/settings',methods=['GET','POST'])
 @login_required
 def settings():
     if request.method == 'POST':
-        category = request.form.get('category')
-        value = request.form.get('categoryvalue')
+        if 'categoryform' in request.form:
+            category = request.form.get('category')
+            value = request.form.get('categoryvalue')
 
-        if len(category) < 1:
-            flash('Category is short!!',category='error')
+            if len(category) < 1:
+                flash('Category is short!!',category='error')
+            else:
+                print(category,value)
+                new_category = Category(name = category, value = value, immediateValue = 10, user_id = current_user.id)
+                db.session.add(new_category)
+                db.session.commit()
+                flash('Food category added!', category='success')
         else:
-            print(category,value)
-            new_category = Category(name = category, value = value, immediateValue = 10, user_id = current_user.id)
-            db.session.add(new_category)
-            db.session.commit()
-            flash('Food category added!', category='success')
+            print(request.files)
+            if 'file' not in request.files :
+                flash('No file part', category = 'error')
+                return render_template("settings.html", user=current_user)
+
+            file = request.files['file']
+
+            if file.filename == '':
+                flash('No selected file',category='error')
+                return render_template("settings.html", user=current_user)
+            
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                file.save(os.path.join(configuration.UPLOAD_FOLDER, filename))
+                flash('File imported!!', category= 'success')
 
     return render_template("settings.html", user=current_user)
 

@@ -1,6 +1,7 @@
 from os import name
 
-from sqlalchemy.sql.expression import asc, desc
+from sqlalchemy.sql.expression import asc, desc, select
+from sqlalchemy.sql.functions import user
 from . import db
 from .models import Category, Food, Menu
 import pandas as pd
@@ -70,18 +71,34 @@ def compute_value(dataMatrix: pd.DataFrame, kernel: pd.DataFrame) -> pd.DataFram
 
 
 def alter_values_add(food: Food, date: date):
+    localset = set()
     for category in food.categories:
-        category.immediateValue *= 0.5
+        category.immediateValue *= 0.8
+        localset.add(category.id)
         db.session.commit()
+    qry = db.session.query(Category).filter(Category.user_id == food.user_id )
+    for category in qry:
+        if category.id not in localset:
+            category.immediateValue *= 1.1
+            db.session.commit()
     food.lastServed = date
     db.session.commit()
     return
 
 def alter_values_remove(food: Food):
+    localset = set()
     for category in food.categories:
         category.immediateValue *= 1.2
+        localset.add(category.id)
         db.session.commit()
     entity = food.menus.order_by(desc(Menu.date)).first()
+
+    qry = db.session.query(Category).filter(Category.user_id == food.user_id )
+    for category in qry:
+        if category.id not in localset:
+            category.immediateValue *= 0.8
+            db.session.commit()
+
     if entity:
         food.lastServed = entity.date
         db.session.commit()
@@ -89,3 +106,13 @@ def alter_values_remove(food: Food):
         food.lastServed = date(2021,12,10)
         db.session.commit()
     return
+
+
+def filter_food_list(foodlist: dict, categories: list) -> dict:
+    newlist = {}
+    cattuple = set([int(x) for x in categories])
+    for food in foodlist:
+        unzip = zip(*foodlist[food]['categories'])
+        if (cattuple.issubset(set(list(unzip)[0]))):
+            newlist[food] = foodlist[food]
+    return newlist

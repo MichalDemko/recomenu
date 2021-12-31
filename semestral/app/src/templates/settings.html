@@ -24,6 +24,7 @@
     </li>
     {% endfor %}
 </ul>
+<div>
 <form method="POST">
     <input 
         type="text" 
@@ -44,7 +45,20 @@
     />
     <br />
     <div align="center">
-        <button type="submit" class="btn btn-primary">Add category</button>
+        <button type="submit" name='categoryform' class="btn btn-primary">Add category</button>
+    </div>
+
+</form>
+</div>
+<div>
+<form method="POST" enctype="multipart/form-data">
+    <div class="form-group"> 
+        <label for="myfile">Select a file with your foods:</label>
+        <input type="file" id="file" name="file" class="form-control-file">
+    </div>
+    <div align="center">
+        <button type="submit"  name='fileform' class="btn btn-primary">Import all foods</button>
     </div>
 </form>
+</div>
 {% endblock %}
