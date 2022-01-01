@@ -17,6 +17,10 @@ views = Blueprint('views',__name__)
 @views.route('/',methods=['GET','POST'])
 @login_required
 def home():
+    """
+    Registers new foods into database
+    :return: rendered home page
+    """
     if request.method == 'POST':
         food = request.form.get('food')
 
@@ -37,6 +41,10 @@ def home():
 
 @views.route('/delete-food', methods=['POST'])
 def delete_food():
+    """
+    Deletes food from database
+    :returns: empty response
+    """
     food = json.loads(request.data)
     foodId = food['foodId']
     food = Food.query.get(foodId)
@@ -50,6 +58,10 @@ def delete_food():
 @views.route('/menu',methods=['GET','POST'])
 @login_required
 def menu():
+    """
+    Registers menus into days
+    :return: rendered menu page
+    """
     foodlist = get_food_list(current_user, date(2021,12,28))
     mydate = request.args.get('date')
     categories_checked = request.args.get('categories')
@@ -74,6 +86,10 @@ def menu():
 @views.route('/settings',methods=['GET','POST'])
 @login_required
 def settings():
+    """
+    Registers category into database and allows to import file with user created foods
+    :return: rendered settings page
+    """
     if request.method == 'POST':
         if 'categoryform' in request.form:
             category = request.form.get('category')
@@ -111,6 +127,10 @@ def settings():
 
 @views.route('/add-to-menu', methods=['POST'])
 def add_to_menu():
+    """
+    Adds food to correct menu
+    :returns: empty response
+    """
     data = json.loads(request.data)
     print(data)
     menu = db.session.query(Menu).filter(
@@ -139,6 +159,10 @@ def add_to_menu():
 
 @views.route('/delete-from-menu', methods=['POST'])
 def delete_from_menu():
+    """
+    Deletes food from menu
+    :returns: empty response
+    """
     data = json.loads(request.data)
     food = Food.query.get(data['food_id'])
     menu = Menu.query.get(data['menu_id'])
@@ -150,6 +174,10 @@ def delete_from_menu():
 
 @views.route('/delete-category', methods=['POST'])
 def delete_category():
+    """
+    Deletes category from database
+    :returns: empty response
+    """
     category = json.loads(request.data)
     categoryId = category['categoryId']
     category = Category.query.get(categoryId)
@@ -163,6 +191,10 @@ def delete_category():
 
 @views.route('/update-category', methods=['POST'])
 def update_category():
+    """
+    Updates category user values
+    :returns: empty response
+    """
     updateData = json.loads(request.data)
     categoryId = updateData['categoryId']
     category = Category.query.get(categoryId)

@@ -8,6 +8,12 @@ from datetime import datetime
 import pandas as pd
 
 def build_categories(user, showCategories: list = None) -> dict:
+    """
+    Creates dictionary representing showed categories
+    :param user: user
+    :param showCategories: list of categories to be checked
+    :returns: dictionary of the categories
+    """
     categories = { cat.id : {'checked' : 0, 'name': cat.name } for cat in user.categories}
     print(showCategories)
     if showCategories != None:
@@ -18,10 +24,21 @@ def build_categories(user, showCategories: list = None) -> dict:
 
 
 def allowed_file(filename):
+    """
+    Checks if filename is in correct format
+    :param filename: string to be checked
+    :returns: bool value
+    """
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in configuration.ALLOWED_EXTENSIONS
 
 
 def import_file_to_database(user, path) -> bool:
+    """
+    Imports values from file into database
+    :param user: user
+    :param path: path to file
+    :returns: bool value
+    """
     print(path)
     file = pd.read_csv(path, sep=';')
     print(file)
@@ -30,6 +47,12 @@ def import_file_to_database(user, path) -> bool:
 
 
 def parse_dataframe(user, df : DataFrame) -> bool:
+    """
+    Parses data from dataframe into database
+    :param user: user
+    :param df: dataframe to parse
+    :returns: bool value
+    """
     if not check_dataframe(df):
         return False
 
@@ -39,6 +62,12 @@ def parse_dataframe(user, df : DataFrame) -> bool:
 
 
 def parse_foods(user, df : DataFrame):
+    """
+    Parses food data from dataframe into database
+    :param user: user
+    :param df: dataframe to parse
+    :returns: bool value
+    """
     labels = df.keys()
     for index, row in df.iterrows():
         food = Food(name = row['name'], user_id = user.id, lastServed = datetime.strptime(row['lastserved'], "%Y-%m-%d").date())
@@ -52,6 +81,11 @@ def parse_foods(user, df : DataFrame):
     return
 
 def parse_categories(user, df : DataFrame):
+    """
+    Parses data from dataframe into database, creates new categories
+    :param user: user
+    :param df: dataframe to parse
+    """
     control = False
     categories = df.keys()
     for category in categories:
@@ -70,6 +104,11 @@ def parse_categories(user, df : DataFrame):
     return
 
 def check_dataframe(df : DataFrame) -> bool:
+    """
+    Checks if dataframe has correct format
+    :param df: dataframe to check
+    :returns: bool value
+    """
     categories = df.keys()
     if ('name' not in categories) or ('lastserved' not in categories) or ('desc' not in categories) or (categories.size <= 3):
         return False

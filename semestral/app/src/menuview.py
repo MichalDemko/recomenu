@@ -7,13 +7,26 @@ import pandas as pd
 import calendar
 
 def get_menu(user, year: int = None, weekNumber: int = None) -> dict:
+    """
+    Returns menu for given year and week
+    :param user: user
+    :param year: number of year
+    :param weekNumber: number of week
+    :returns: dictionary representing menu
+    """
     if year == None and weekNumber == None:
         return select_week(user, dt.date.today().isocalendar().year, dt.date.today().isocalendar().week)
     return select_week(user, year, weekNumber)
 
 
 def select_week(user, year: int, weekNumber: int) -> dict:
-
+    """
+    Returns menu for given year and week
+    :param user: user
+    :param year: number of year
+    :param weekNumber: number of week
+    :returns: dictionary representing menu
+    """
     datefrom = dt.datetime.strptime( f"{year}-{weekNumber}-1", "%Y-%W-%w").date()
     dateto = dt.datetime.strptime( f"{year}-{weekNumber}-0", "%Y-%W-%w").date()
     qry = db.session.query(Menu).filter(
