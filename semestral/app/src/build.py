@@ -15,11 +15,9 @@ def build_categories(user, showCategories: list = None) -> dict:
     :returns: dictionary of the categories
     """
     categories = { cat.id : {'checked' : 0, 'name': cat.name } for cat in user.categories}
-    print(showCategories)
     if showCategories != None:
         for x in showCategories:
             categories[int(x)]['checked'] = 1
-    print(categories)
     return categories
 
 
@@ -39,9 +37,7 @@ def import_file_to_database(user, path) -> bool:
     :param path: path to file
     :returns: bool value
     """
-    print(path)
     file = pd.read_csv(path, sep=';')
-    print(file)
     parse_dataframe(user, file)
     return True
 

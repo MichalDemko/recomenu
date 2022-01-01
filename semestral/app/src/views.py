@@ -72,8 +72,6 @@ def menu():
         menu = get_menu(current_user)
 
     if categories_checked:
-        print("CATEGORIES")
-        print(categories_checked)
         categories_checked = categories_checked.split(',')
         foodlist = filter_food_list(foodlist, categories_checked)
         categories = build_categories(current_user, categories_checked)
@@ -98,7 +96,6 @@ def settings():
             if len(category) < 1:
                 flash('Category is short!!',category='error')
             else:
-                print(category,value)
                 new_category = Category(name = category, value = value, immediateValue = 10, user_id = current_user.id)
                 db.session.add(new_category)
                 db.session.commit()
@@ -132,7 +129,6 @@ def add_to_menu():
     :returns: empty response
     """
     data = json.loads(request.data)
-    print(data)
     menu = db.session.query(Menu).filter(
         and_(Menu.date == data['date'], Menu.user_id == current_user.id)
     ).first()
@@ -146,8 +142,6 @@ def add_to_menu():
         menu.foods.append(food)
         db.session.commit()
     else:
-        print("create menu")
-        print(datetime.strptime(data['date'], "%Y-%m-%d").date())
         newmenu= Menu(user_id = current_user.id, 
                       date = date)
         alter_values_add(food,date)

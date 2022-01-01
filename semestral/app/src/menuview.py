@@ -35,7 +35,6 @@ def select_week(user, year: int, weekNumber: int) -> dict:
         desc(Menu.date)
     )
     week = {}
-    print("Query:")
     for i in range(7):
         date = (datefrom + dt.timedelta(days=i))
         menu = qry.filter(Menu.date == date).first()
