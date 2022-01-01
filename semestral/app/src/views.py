@@ -6,7 +6,7 @@ from sqlalchemy.sql.elements import and_
 from .models import Category, Food, Menu
 from . import db
 from .recommend import get_food_list, alter_values_add, alter_values_remove, filter_food_list
-from .build import build_categories, allowed_file
+from .build import build_categories, allowed_file, import_file_to_database
 from .menuview import get_menu
 from datetime import date, datetime
 from werkzeug.utils import secure_filename
@@ -88,7 +88,6 @@ def settings():
                 db.session.commit()
                 flash('Food category added!', category='success')
         else:
-            print(request.files)
             if 'file' not in request.files :
                 flash('No file part', category = 'error')
                 return render_template("settings.html", user=current_user)
@@ -101,7 +100,10 @@ def settings():
             
             if file and allowed_file(file.filename):
                 filename = secure_filename(file.filename)
-                file.save(os.path.join(configuration.UPLOAD_FOLDER, filename))
+                path = os.path.join(configuration.UPLOAD_FOLDER, filename)
+                file.save(path)
+                import_file_to_database(current_user, path)
+                
                 flash('File imported!!', category= 'success')
 
     return render_template("settings.html", user=current_user)

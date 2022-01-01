@@ -38,5 +38,4 @@ def select_week(user, year: int, weekNumber: int) -> dict:
                                                           'nextweek': date+dt.timedelta(days=7),
                                                           'beforeweek': date-dt.timedelta(days=7),
                                                           'foods': [(x.id,x.name) for x in menu.foods]}
-    print(week)
     return week
