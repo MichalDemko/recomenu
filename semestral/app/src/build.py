@@ -7,6 +7,7 @@ from . import db
 from datetime import datetime
 import pandas as pd
 
+
 def build_categories(user, showCategories: list = None) -> dict:
     """
     Creates dictionary representing showed categories
@@ -14,8 +15,9 @@ def build_categories(user, showCategories: list = None) -> dict:
     :param showCategories: list of categories to be checked
     :returns: dictionary of the categories
     """
-    categories = { cat.id : {'checked' : 0, 'name': cat.name } for cat in user.categories}
-    if showCategories != None:
+    categories = {cat.id: {'checked': 0, 'name': cat.name}
+                  for cat in user.categories}
+    if showCategories is not None:
         for x in showCategories:
             categories[int(x)]['checked'] = 1
     return categories
@@ -42,7 +44,7 @@ def import_file_to_database(user, path) -> bool:
     return True
 
 
-def parse_dataframe(user, df : DataFrame) -> bool:
+def parse_dataframe(user, df: DataFrame) -> bool:
     """
     Parses data from dataframe into database
     :param user: user
@@ -53,11 +55,11 @@ def parse_dataframe(user, df : DataFrame) -> bool:
         return False
 
     parse_categories(user, df)
-    parse_foods(user,df)
+    parse_foods(user, df)
     return True
 
 
-def parse_foods(user, df : DataFrame):
+def parse_foods(user, df: DataFrame):
     """
     Parses food data from dataframe into database
     :param user: user
@@ -66,17 +68,20 @@ def parse_foods(user, df : DataFrame):
     """
     labels = df.keys()
     for index, row in df.iterrows():
-        food = Food(name = row['name'], user_id = user.id, lastServed = datetime.strptime(row['lastserved'], "%Y-%m-%d").date())
+        food = Food(name=row['name'], user_id=user.id, lastServed=datetime.strptime(
+            row['lastserved'], "%Y-%m-%d").date())
         for category in labels:
             if category not in configuration.IMPORT_LABELS_NOT_CATEGORY:
                 if row[category] == 1:
-                    cat = db.session.query(Category).filter(and_(Category.name == category, Category.user_id == user.id)).first()
+                    cat = db.session.query(Category).filter(
+                        and_(Category.name == category, Category.user_id == user.id)).first()
                     food.categories.append(cat)
         db.session.add(food)
         db.session.commit()
     return
 
-def parse_categories(user, df : DataFrame):
+
+def parse_categories(user, df: DataFrame):
     """
     Parses data from dataframe into database, creates new categories
     :param user: user
@@ -91,15 +96,16 @@ def parse_categories(user, df : DataFrame):
                     control = True
 
             if not control:
-                new_category = Category(name = category, 
-                                        value = configuration.CATEGORIES_DEFAULT_IMPORT_VALUE,
-                                        immediateValue = configuration.CATEGORIES_DEFAULT_IMPORT_IMMEDIATEVALUE,
-                                        user_id = user.id)
+                new_category = Category(name=category,
+                                        value=configuration.CATEGORIES_DEFAULT_IMPORT_VALUE,
+                                        immediateValue=configuration.CATEGORIES_DEFAULT_IMPORT_IMMEDIATEVALUE,
+                                        user_id=user.id)
                 db.session.add(new_category)
                 db.session.commit()
     return
 
-def check_dataframe(df : DataFrame) -> bool:
+
+def check_dataframe(df: DataFrame) -> bool:
     """
     Checks if dataframe has correct format
     :param df: dataframe to check

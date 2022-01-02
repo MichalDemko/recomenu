@@ -4,6 +4,7 @@ from flask_login import UserMixin
 from sqlalchemy.sql import func
 import datetime
 
+
 class Category(db.Model):
     """
     Database model for category
@@ -13,23 +14,28 @@ class Category(db.Model):
     name = db.Column(db.String(100))
     value = db.Column(db.Float())
     immediateValue = db.Column(db.Float())
-    user_id = db.Column(db.Integer,db.ForeignKey('users.id'))
-    foods = db.relationship('Food',secondary='food_category',back_populates='categories')
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    foods = db.relationship(
+        'Food', secondary='food_category', back_populates='categories')
+
 
 class Food(db.Model):
     """
     Database model for food
     """
     __tablename__ = "foods"
-    id = db.Column(db.Integer, primary_key = True)
-    name = db.Column(db.String(100)) 
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100))
     data = db.Column(db.String(10000))
-    date = db.Column(db.DateTime(timezone = True), default = func.now())
-    lastServed = db.Column(db.Date, default = datetime.date(2021,12,10))
+    date = db.Column(db.DateTime(timezone=True), default=func.now())
+    lastServed = db.Column(db.Date, default=datetime.date(2021, 12, 10))
     value = db.Column(db.Float())
-    user_id = db.Column(db.Integer,db.ForeignKey('users.id'))
-    categories = db.relationship('Category', secondary = 'food_category',back_populates = 'foods')
-    menus = db.relationship('Menu', secondary = 'food_menu', back_populates = 'foods', lazy='dynamic')
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    categories = db.relationship(
+        'Category', secondary='food_category', back_populates='foods')
+    menus = db.relationship('Menu', secondary='food_menu',
+                            back_populates='foods', lazy='dynamic')
+
 
 class FoodCategory(db.Model):
     """
@@ -39,6 +45,7 @@ class FoodCategory(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     food_id = db.Column(db.Integer, db.ForeignKey('foods.id'))
     category_id = db.Column(db.Integer, db.ForeignKey('categories.id'))
+
 
 class User(db.Model, UserMixin):
     """
@@ -69,8 +76,10 @@ class Menu(db.Model):
     Database model for menu
     """
     __tablename__ = "menus"
-    id = db.Column(db.Integer, primary_key = True)
+    id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     date = db.Column(db.Date)
-    foods = db.relationship('Food', secondary='food_menu', back_populates='menus')
-    __table_args__ = (db.UniqueConstraint('user_id', 'date', name = '_menu_user_date_uc'),)
+    foods = db.relationship(
+        'Food', secondary='food_menu', back_populates='menus')
+    __table_args__ = (db.UniqueConstraint(
+        'user_id', 'date', name='_menu_user_date_uc'),)
